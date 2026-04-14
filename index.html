@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WOLF LABS | Countryside Routine (A1)</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { display: ['Montserrat', 'sans-serif'], body: ['Outfit', 'sans-serif'], code: ['Fira Code', 'monospace'] },
+                    colors: { brand: '#10b981', accent: '#fbbf24', correct: '#10b981', incorrect: '#ef4444' } /* Emerald and Gold for Countryside Vibe */
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- CUSTOM CSS ENGINE --- */
+        body { background-color: #022c22; overflow: hidden; color: #ffffff; }
+        * { -webkit-tap-highlight-color: transparent; outline: none; }
+
+        /* Background & Particles */
+        .bg-layer { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #064e3b 0%, #022c22 100%); }
+        .bg-image { position: absolute; inset: 0; background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000'); background-size: cover; background-position: center; opacity: 0.2; filter: grayscale(30%) brightness(0.6); }
+        .ambient-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.25; animation: float 20s infinite alternate; }
+        @keyframes float { from { transform: translate(0,0); } to { transform: translate(100px, 50px); } }
+
+        /* Glassmorphism - Premium Upgrade */
+        .glass-panel { background: rgba(2, 44, 34, 0.65); backdrop-filter: blur(40px); border: 1px solid rgba(16, 185, 129, 0.5); box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 30px rgba(16, 185, 129, 0.1); }
+        
+        /* Slides */
+        .main-container { position: fixed; top: 70px; bottom: 80px; left: 0; right: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+        .main-container::-webkit-scrollbar { display: none; }
+        .slide { display: none; flex-direction: column; align-items: center; min-height: 100%; padding: 40px 5%; animation: fadeIn 0.5s ease; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .slide.active { display: flex; }
+        .slide::before, .slide::after { content: ''; flex: 1 0 auto; } /* Safe vertical centering */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Premium Buttons - Enhanced Glow */
+        .btn-gold { background: linear-gradient(135deg, var(--brand), #047857); color: #ffffff !important; padding: 16px 45px; border-radius: 14px; font-weight: 800; font-family: 'Montserrat', sans-serif; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5), inset 0 2px 0 rgba(255,255,255,0.4); display: inline-flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); letter-spacing: 1px;}
+        .btn-gold:hover:not(:disabled) { transform: translateY(-4px); background: linear-gradient(135deg, #34d399, var(--brand)); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.8), inset 0 2px 0 rgba(255,255,255,0.6); }
+        .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Interactive Elements */
+        .speaking-hub { display: none; width: 100%; margin-top: 30px; padding: 30px; background: rgba(0,0,0,0.7); border-radius: 20px; border-left: 5px solid var(--accent); animation: fadeIn 0.5s ease; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .starter-btn { background: rgba(251, 191, 36, 0.15); border: 1px dashed var(--accent); color: var(--accent) !important; padding: 10px 20px; border-radius: 50px; cursor: pointer; transition: 0.3s; font-family: 'Fira Code', monospace; margin-top: 15px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.8);}
+        .starter-btn:hover { background: var(--accent); color: #000000 !important; box-shadow: 0 0 15px rgba(251,191,36,0.6); }
+        .starter-content { display: none; margin-top: 15px; padding: 20px; background: rgba(0,0,0,0.6); border-left: 4px solid var(--brand); border-radius: 12px; font-family: 'Fira Code', monospace; font-size: 1.2rem; color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+        /* Videos */
+        .video-wrapper { position: relative; width: 100%; max-width: 850px; aspect-ratio: 16/9; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+
+        /* RPG & Damage Feedback */
+        .damage-flash { position: fixed; inset: 0; background: rgba(239, 68, 68, 0.4); z-index: 9998; pointer-events: none; display: none; }
+        .shake { animation: shakeX 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shakeX { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .xp-popup { position: fixed; color: var(--accent); font-weight: 900; font-size: 2.5rem; font-family: 'Fira Code', monospace; z-index: 9999; pointer-events: none; text-shadow: 0 0 20px var(--accent); animation: floatUpText 1s forwards; }
+        @keyframes floatUpText { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+
+        /* Specific Game Components */
+        /* Topic Cards */
+        .t-card { width: 320px; height: 380px; position: relative; cursor: pointer; transform-style: preserve-3d; transition: 0.8s; flex-shrink: 0;}
+        .t-card.flipped { transform: rotateY(180deg) scale(1.05); pointer-events: none; }
+        .t-front, .t-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .t-front { background: linear-gradient(135deg, #064e3b, #022c22); font-size: 4rem; color: #ffffff !important; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .t-front:hover { border-color: var(--brand); box-shadow: 0 10px 40px rgba(16,185,129,0.5); transform: translateY(-5px); }
+        .t-back { background: linear-gradient(135deg, var(--brand), #047857); transform: rotateY(180deg); font-size: 1.5rem; font-weight: 800; color: #ffffff !important; text-shadow: 0 2px 5px rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.4); }
+
+        /* Phone UI */
+        .phone-ui { width: 100%; max-width: 380px; height: 600px; background: #022c22; border: 10px solid #064e3b; border-radius: 40px; display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.9); }
+        .phone-msg { padding: 14px 20px; border-radius: 18px; max-width: 85%; font-size: 1.1rem; margin-bottom: 10px; animation: fadeIn 0.3s forwards; color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+        .msg-received { background: #064e3b; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
+        .msg-sent { background: linear-gradient(135deg, var(--brand), #047857); align-self: flex-end; border-bottom-right-radius: 4px; display: none; border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Word Chips & Syntax */
+        .word-chip { cursor: pointer; transition: 0.3s; user-select: none; background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)) !important; border: 1px solid rgba(255,255,255,0.3) !important; backdrop-filter: blur(10px); color: #ffffff !important; text-shadow: 0 2px 5px rgba(0,0,0,0.8); font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .word-chip:hover { transform: translateY(-4px) scale(1.05); background: linear-gradient(135deg, var(--brand), #047857) !important; border-color: rgba(255,255,255,0.6) !important; box-shadow: 0 10px 25px rgba(16,185,129,0.6); }
+
+        /* Match Buttons */
+        .match-btn { color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8); background: rgba(6, 78, 59, 0.8); }
+        .match-btn.selected { border-color: var(--accent); background: rgba(251, 191, 36, 0.3); box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); color: #ffffff !important; }
+        .match-btn.matched { border-color: #10b981; background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(4, 120, 87, 0.6)); pointer-events: none; color: #ffffff !important; box-shadow: 0 0 15px rgba(16,185,129,0.4); }
+
+        /* Agree Buttons */
+        .agree-btn { color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .agree-btn.selected.agree { background: linear-gradient(135deg, #10b981, #047857); border-color: #34d399; box-shadow: 0 10px 30px rgba(16,185,129,0.5); }
+        .agree-btn.selected.neutral { background: linear-gradient(135deg, #f59e0b, #b45309); border-color: #fbbf24; box-shadow: 0 10px 30px rgba(245,158,11,0.5); }
+        .agree-btn.selected.disagree { background: linear-gradient(135deg, #ef4444, #b91c1c); border-color: #f87171; box-shadow: 0 10px 30px rgba(239,68,68,0.5); }
+
+        /* Sidebars */
+        .sidebar { position: fixed; top: 0; width: 450px; max-width: 100vw; height: 100vh; background: rgba(2, 44, 34, 0.98); z-index: 2000; padding: 80px 40px; backdrop-filter: blur(25px); transition: 0.5s; border-left: 1px solid rgba(16, 185, 129, 0.4); box-shadow: -20px 0 50px rgba(0,0,0,0.9); }
+        #sidebar-left { left: -500px; border-right: 1px solid rgba(16, 185, 129, 0.4); border-left: none; box-shadow: 20px 0 50px rgba(0,0,0,0.9); }
+        #sidebar-left.open { left: 0; }
+        #sidebar-right { right: -500px; }
+        #sidebar-right.open { right: 0; }
+
+        /* Footer */
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: rgba(2, 44, 34, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); z-index: 150; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: center; padding: 0 15px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+        .nav-btn { background: transparent; border: none; color: #cbd5e1; padding: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; font-family: var(--font-code); display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); white-space: nowrap; flex-shrink: 0; }
+        .nav-btn:hover:not(:disabled) { color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .nav-btn.next { background: linear-gradient(135deg, var(--brand), #047857); color: #ffffff !important; border-radius: 12px; padding: 10px 20px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5); border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); flex-shrink: 0; }
+        .nav-btn.next:hover:not(:disabled) { background: linear-gradient(135deg, #34d399, var(--brand)); box-shadow: 0 15px 35px rgba(16, 185, 129, 0.7); transform: translateY(-2px); }
+        .nav-btn.next.pulsing { animation: pulseNext 2s infinite; background: linear-gradient(135deg, #34d399, var(--brand)); }
+        .progress-bar { position: fixed; bottom: 80px; left: 0; height: 5px; background: var(--brand); transition: 0.4s; z-index: 101; box-shadow: 0 0 15px var(--brand); }
+        @keyframes pulseNext { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+    </style>
+</head>
+<body>
+
+    <!-- Backgrounds -->
+    <div class="bg-layer">
+        <div class="bg-image"></div>
+        <div class="ambient-orb orb-1" style="background: #10b981; top: -10%; left: -10%; width: 50vw; height: 50vw;"></div>
+        <div class="ambient-orb orb-2" style="background: #fbbf24; bottom: -10%; right: -10%; width: 40vw; height: 40vw;"></div>
+    </div>
+    <div class="damage-flash" id="damageFlash"></div>
+
+    <!-- TOP NAVBAR (HUD) -->
+    <nav class="fixed top-4 left-[2%] w-[96%] h-[70px] glass-panel rounded-2xl flex items-center justify-between px-6 z-50">
+        <div class="font-display font-black text-xl flex items-center gap-3 tracking-widest text-white drop-shadow-md">
+            <i class="fa-solid fa-leaf text-brand"></i> WOLF LABS
+        </div>
+        
+        <!-- Stats -->
+        <div id="playerStats" class="hidden items-center gap-6">
+            <div class="flex items-center gap-2" title="Energy Level">
+                <i class="fa-solid fa-heart-pulse text-brand drop-shadow-[0_0_10px_#10b981]"></i>
+                <div id="hudHp" class="flex gap-1 text-brand"></div>
+            </div>
+            <div class="flex items-center gap-2 bg-amber-500/20 px-4 py-1.5 rounded-full border border-amber-500/50 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                <i class="fa-solid fa-star text-accent"></i>
+                <span id="hudXp" class="font-code font-bold text-accent tracking-wide">0 XP</span>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex gap-3">
+            <button onclick="toggleSidebar('sidebar-left')" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-brand hover:border-brand transition flex items-center justify-center text-white shadow-lg" title="Teacher Tools"><i class="fa-solid fa-toolbox"></i></button>
+            <button onclick="toggleSidebar('sidebar-right')" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-brand hover:border-brand transition flex items-center justify-center text-white shadow-lg" title="Whiteboard"><i class="fa-solid fa-pen-nib"></i></button>
+            <button onclick="toggleFullscreen()" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-brand hover:border-brand transition flex items-center justify-center text-white shadow-lg" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+        </div>
+    </nav>
+
+    <!-- LEFT SIDEBAR: TEACHER HUD -->
+    <div id="sidebar-left" class="sidebar">
+        <button onclick="toggleSidebar('sidebar-left')" class="absolute top-6 right-6 text-3xl text-slate-300 hover:text-white transition"><i class="fa-solid fa-times"></i></button>
+        <h2 class="font-display font-black text-2xl text-brand mb-8 border-b border-brand/30 pb-4 drop-shadow-md">TEACHER TOOLS</h2>
+        
+        <div class="mb-10">
+            <h3 class="font-code text-slate-300 font-bold text-sm mb-3 tracking-widest">TIMER CONTROLS</h3>
+            <div class="text-5xl font-display font-black text-white mb-6 text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" id="dmTimer">00:60</div>
+            <button onclick="startTimer()" class="w-full bg-white/10 border border-white/20 hover:bg-brand hover:border-brand text-white py-4 rounded-xl font-bold transition shadow-lg uppercase tracking-wider">Start 60s Timer</button>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="font-code text-slate-300 font-bold text-sm mb-3 tracking-widest">DM ACTIONS</h3>
+            <button onclick="gainXP(50)" class="w-full bg-amber-600/30 border border-amber-500/50 hover:bg-accent text-white hover:text-black py-4 rounded-xl font-bold transition mb-4 flex items-center justify-center gap-3 shadow-[0_0_15px_rgba(251,191,36,0.2)]"><i class="fa-solid fa-plus text-xl"></i> Give 50 XP</button>
+            <button onclick="healPlayer()" class="w-full bg-brand/30 border border-brand/50 hover:bg-brand text-white py-4 rounded-xl font-bold transition flex items-center justify-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.2)]"><i class="fa-solid fa-heart text-xl"></i> Restore 1 Heart</button>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: WHITEBOARD & DICT -->
+    <div id="sidebar-right" class="sidebar">
+        <button onclick="toggleSidebar('sidebar-right')" class="absolute top-6 left-6 text-3xl text-slate-300 hover:text-white transition"><i class="fa-solid fa-times"></i></button>
+        
+        <div class="h-full flex flex-col pt-8">
+            <h2 class="font-display font-black text-3xl text-white mb-6 border-b border-white/20 pb-4 drop-shadow-md">WHITEBOARD</h2>
+            <textarea class="flex-1 bg-black/60 border border-brand/30 rounded-2xl p-6 font-code text-emerald-300 text-xl resize-none outline-none focus:border-brand focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition shadow-inner" placeholder="// Note grammar errors here..."></textarea>
+        </div>
+    </div>
+
+    <!-- DICTIONARY MODAL -->
+    <div id="dict-modal" class="fixed inset-0 z-[3000] hidden items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="bg-[#022c22] border-2 border-accent/50 rounded-3xl p-10 max-w-2xl w-full shadow-[0_0_50px_rgba(251,191,36,0.3)] relative transform transition-all">
+            <button onclick="closeDict()" class="absolute top-6 right-6 text-3xl text-slate-400 hover:text-white transition"><i class="fa-solid fa-times"></i></button>
+            <h2 class="font-display font-black text-2xl text-accent mb-6 border-b border-accent/30 pb-4 drop-shadow-md">SMART DICT</h2>
+            <h1 id="d-word" class="text-5xl font-display font-black text-white mb-2 drop-shadow-md uppercase">Word</h1>
+            <span id="d-phonetic" class="text-accent block mb-6 text-xl font-bold tracking-widest">/phonetic/</span>
+            <p id="d-def" class="text-slate-200 mb-8 text-2xl leading-relaxed">Definition will appear here.</p>
+            <div class="bg-white/10 p-5 rounded-2xl border-l-4 border-brand text-white italic text-xl shadow-inner mb-8" id="d-context">Context example.</div>
+            
+            <div class="bg-brand/20 border border-brand/50 p-6 rounded-2xl shadow-inner">
+                <span class="text-brand font-bold text-sm uppercase tracking-widest block mb-3"><i class="fa-solid fa-microphone mr-2"></i> Discussion Follow-up</span>
+                <p id="d-speak" class="text-white text-2xl font-bold drop-shadow-md">Question here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SLIDES CONTAINER -->
+    <main class="main-container" id="slides-container">
+
+        <!-- 1. TEACHER'S GUIDE -->
+        <div class="slide active">
+            <div class="glass-panel text-left w-full">
+                <h2 class="font-display text-3xl text-white mb-6 border-b border-white/10 pb-4 drop-shadow-md"><i class="fa-solid fa-chalkboard-user text-brand mr-3"></i> TEACHER'S GUIDE (TG)</h2>
+                <div class="bg-black/60 p-8 rounded-2xl border border-brand/40 shadow-inner">
+                    <p class="font-bold text-brand text-2xl mb-6 drop-shadow-md">OBJECTIVE: Countryside Routine (Simple Present A1)</p>
+                    <ul class="space-y-5 text-xl text-white font-medium">
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> <strong>Grammar Focus:</strong> Daily Routines, Habits, and the "S" rule for He/She/It.</li>
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> <strong>The Vibe:</strong> A relaxing escape from the city. Ask students about their mornings.</li>
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> <strong>Gamified Journey:</strong> The student has Energy (Hearts) and earns Experience Points. Mistakes cost energy. Correct tasks give points.</li>
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> <strong>Wolf Tip:</strong> Guide the student to speak in the "Speaking Hubs" and use the top-left Tools to reward them with XP!</li>
+                    </ul>
+                </div>
+                <div class="text-center mt-12">
+                    <button class="btn-gold" onclick="nextSlide()"><i class="fa-solid fa-power-off"></i> INITIALIZE SYSTEM</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. COVER & ROLE CREATION (Simplified) -->
+        <div class="slide">
+            <div class="text-center w-full max-w-4xl">
+                <i class="fa-solid fa-tractor text-8xl text-brand mb-6 drop-shadow-[0_0_40px_rgba(16,185,129,0.8)]"></i>
+                <h1 class="text-6xl md:text-8xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-emerald-600 mb-4 drop-shadow-lg">MY DAILY ROUTINE</h1>
+                <p class="text-2xl font-code text-accent font-bold tracking-widest uppercase mb-12 drop-shadow-md">Simple Present (A1)</p>
+
+                <div class="glass-panel p-10 rounded-3xl max-w-xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-8 text-white drop-shadow-md">Welcome to the Countryside</h3>
+                    <input type="text" id="s-name" class="w-full bg-black/60 border-2 border-white/20 rounded-xl px-6 py-4 text-2xl font-bold text-center text-white mb-10 focus:border-brand shadow-inner placeholder-white/40" placeholder="Enter Your Name...">
+                    
+                    <button class="btn-gold w-full justify-center text-xl py-5" onclick="startGame()">START YOUR DAY</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ICEBREAKER 1 (Vibe Check) -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-cloud-sun"></i> VIBE CHECK</h2>
+                <p class="text-3xl font-bold text-white mb-12 leading-tight">Hello, <span class="dyn-name text-accent drop-shadow-md">GUEST</span>. Where do you prefer to live?</p>
+                <div class="flex flex-wrap justify-center gap-6 mb-10">
+                    <button class="px-10 py-5 bg-[#064e3b] border-2 border-slate-500 rounded-2xl text-white font-black text-xl hover:bg-brand hover:border-brand hover:shadow-[0_0_20px_rgba(16,185,129,0.6)] transition" onclick="genericCorrect('hub-ice1')">IN THE BIG CITY</button>
+                    <button class="px-10 py-5 bg-[#064e3b] border-2 border-slate-500 rounded-2xl text-white font-black text-xl hover:bg-brand hover:border-brand hover:shadow-[0_0_20px_rgba(16,185,129,0.6)] transition" onclick="genericCorrect('hub-ice1')">IN THE COUNTRYSIDE</button>
+                </div>
+                <div id="hub-ice1" class="speaking-hub">
+                    <p class="text-xl text-white font-medium"><strong>Teacher:</strong> "Why do you prefer that place? Is it quiet or noisy?"</p>
+                    <button class="starter-btn" onclick="revealStarter(this)"><i class="fa-solid fa-lightbulb"></i> Show Starter</button>
+                    <div class="starter-content">"I prefer the... because it is..."</div>
+                    <button class="btn-gold mt-8" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. ICEBREAKER 2 (Topic Cards) -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-mug-hot"></i> MORNING CHAT</h2>
+                <p class="text-2xl text-white font-bold mb-12">Click a card to reveal a question about your routine!</p>
+                <div class="flex flex-row flex-wrap justify-center gap-8 w-full max-w-6xl mx-auto">
+                    <div class="t-card" onclick="flipTopic(this, 'What time do you usually wake up?', 'I usually wake up at...')">
+                        <div class="t-front"><i class="fa-regular fa-clock"></i></div>
+                        <div class="t-back"></div>
+                    </div>
+                    <div class="t-card" onclick="flipTopic(this, 'Do you drink coffee or tea in the morning?', 'I drink... / I don\'t drink...')">
+                        <div class="t-front"><i class="fa-solid fa-mug-saucer"></i></div>
+                        <div class="t-back"></div>
+                    </div>
+                    <div class="t-card" onclick="flipTopic(this, 'What is the first thing you do every day?', 'The first thing I do is...')">
+                        <div class="t-front"><i class="fa-solid fa-sun"></i></div>
+                        <div class="t-back"></div>
+                    </div>
+                </div>
+                <div id="hub-cards" class="speaking-hub">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> Ask follow-up questions to keep the conversation going!</p>
+                    <button class="starter-btn" onclick="revealStarter(this)"><i class="fa-solid fa-lightbulb"></i> Show Starter</button>
+                    <div class="starter-content" id="cards-starter">"..."</div>
+                    <button class="btn-gold mt-8" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. VOCAB 1 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-box-open"></i> THE BARN: VOCAB 1</h2>
+                <p class="text-2xl text-white font-bold mb-12">Click to discover the countryside vocabulary.</p>
+                <div class="flex flex-wrap justify-center gap-8">
+                    <div class="w-56 h-56 bg-[#064e3b] border-2 border-white/20 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-brand hover:border-white transition shadow-lg group" onclick="openDict('take a stroll', this)">
+                        <i class="fa-solid fa-shoe-prints text-5xl text-accent group-hover:text-white transition mb-6 drop-shadow-md"></i>
+                        <span class="font-black text-white text-xl tracking-wide text-shadow-glow text-center">Take a stroll</span>
+                    </div>
+                    <div class="w-56 h-56 bg-[#064e3b] border-2 border-white/20 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-brand hover:border-white transition shadow-lg group" onclick="openDict('bucket', this)">
+                        <i class="fa-solid fa-bucket text-5xl text-accent group-hover:text-white transition mb-6 drop-shadow-md"></i>
+                        <span class="font-black text-white text-xl tracking-wide text-shadow-glow text-center">Bucket</span>
+                    </div>
+                </div>
+                <button class="btn-gold mt-12" onclick="nextSlide()">PROCEED</button>
+            </div>
+        </div>
+
+        <!-- 6. VOCAB 2 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-box-open"></i> THE KITCHEN: VOCAB 2</h2>
+                <p class="text-2xl text-white font-bold mb-12">Click to discover more vocabulary.</p>
+                <div class="flex flex-wrap justify-center gap-8">
+                    <div class="w-56 h-56 bg-[#064e3b] border-2 border-white/20 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-brand hover:border-white transition shadow-lg group" onclick="openDict('peel', this)">
+                        <i class="fa-solid fa-lemon text-5xl text-accent group-hover:text-white transition mb-6 drop-shadow-md"></i>
+                        <span class="font-black text-white text-xl tracking-wide text-center text-shadow-glow">Peel</span>
+                    </div>
+                    <div class="w-56 h-56 bg-[#064e3b] border-2 border-white/20 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-brand hover:border-white transition shadow-lg group" onclick="openDict('barefoot', this)">
+                        <i class="fa-solid fa-socks text-5xl text-accent group-hover:text-white transition mb-6 drop-shadow-md"></i>
+                        <span class="font-black text-white text-xl tracking-wide text-center text-shadow-glow">Barefoot</span>
+                    </div>
+                </div>
+                <button class="btn-gold mt-12" onclick="nextSlide()">ENTER VIDEO VAULT</button>
+            </div>
+        </div>
+
+        <!-- 7. VIDEO PART 1 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-brands fa-youtube"></i> A GENTLE START</h2>
+                <p class="text-2xl text-white font-bold mb-8">Watch from 0:00 to 2:20. How does Jay begin his day?</p>
+                <div class="video-wrapper mx-auto shadow-[0_0_40px_rgba(0,0,0,0.8)] border-2 border-white/20">
+                    <iframe data-src="https://www.youtube-nocookie.com/embed/VsqkTzOVP9U?start=0&end=140&rel=0&modestbranding=1" allowfullscreen></iframe>
+                </div>
+                <button class="btn-gold" onclick="nextSlide()">I FINISHED WATCHING</button>
+            </div>
+        </div>
+
+        <!-- 8. GRAMMAR BLUEPRINT 1 -->
+        <div class="slide">
+            <div class="glass-panel text-left w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 text-center drop-shadow-lg"><i class="fa-solid fa-book-atlas"></i> SIMPLE PRESENT (+)</h2>
+                <p class="text-2xl text-center font-bold mb-12 text-white drop-shadow-md">Habits & Routines</p>
+                
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div class="bg-black/60 p-10 rounded-3xl border-2 border-brand/40 shadow-lg">
+                        <h3 class="text-brand font-black text-2xl mb-6 drop-shadow-md">I / YOU / WE / THEY</h3>
+                        <p class="text-xl text-white font-medium mb-6 leading-relaxed">Use the base verb to talk about routines.</p>
+                        <div class="bg-brand/20 p-6 rounded-xl border-l-4 border-brand text-white text-xl font-bold shadow-inner">
+                            "<span class="text-brand drop-shadow-md">I</span> <span class="text-brand drop-shadow-md">wake up</span> at 6:59 AM."
+                        </div>
+                    </div>
+                    <div class="bg-black/60 p-10 rounded-3xl border-2 border-accent/40 shadow-lg">
+                        <h3 class="text-accent font-black text-2xl mb-6 drop-shadow-md">HE / SHE / IT</h3>
+                        <p class="text-xl text-white font-medium mb-6 leading-relaxed">Add <strong class="text-accent">"s"</strong> or <strong class="text-accent">"es"</strong> to the verb!</p>
+                        <div class="bg-accent/20 p-6 rounded-xl border-l-4 border-accent text-white text-xl font-bold shadow-inner">
+                            "<span class="text-accent drop-shadow-md">He</span> <span class="text-accent drop-shadow-md">takes</span> a walk in the morning."
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-12">
+                    <button class="btn-gold text-xl py-5 px-10" onclick="nextSlide()">PRACTICE IT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. GRAMMAR SANDBOX 1 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-sliders"></i> THE MIXING DESK</h2>
+                <p class="text-2xl text-white font-bold mb-10">Change the subject to see what happens to the verb.</p>
+                
+                <div class="flex flex-wrap justify-center gap-6 mb-12">
+                    <button class="px-8 py-4 bg-brand border border-white/30 text-white rounded-2xl font-black text-lg shadow-[0_0_15px_rgba(16,185,129,0.5)]" onclick="switchSand(this, 'I DRINK coffee every day.', 'Subject: I')">I Drink</button>
+                    <button class="px-8 py-4 bg-[#064e3b] border border-white/20 text-white rounded-2xl font-bold text-lg hover:bg-brand/80 hover:border-white transition shadow-lg" onclick="switchSand(this, 'SHE DRINKS coffee every day.', 'Subject: She (+s)')">She Drinks</button>
+                    <button class="px-8 py-4 bg-[#064e3b] border border-white/20 text-white rounded-2xl font-bold text-lg hover:bg-brand/80 hover:border-white transition shadow-lg" onclick="switchSand(this, 'THE DOG SLEEPS in the shade.', 'Subject: It (+s)')">The Dog Sleeps</button>
+                </div>
+                
+                <div class="bg-black/80 p-12 rounded-[2rem] border-l-[10px] border-brand w-full max-w-4xl mx-auto shadow-inner">
+                    <p id="sand-label" class="text-accent font-code font-black text-xl tracking-[0.2em] mb-6 drop-shadow-md">Subject: I</p>
+                    <p id="sand-text" class="text-4xl font-black text-white leading-relaxed"><span class="bg-brand/20 border border-brand/50 text-brand px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.3)]">I</span> <span class="bg-brand/20 border border-brand/50 text-brand px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.3)]">DRINK</span> coffee every day.</p>
+                </div>
+                <button class="btn-gold mt-12" onclick="nextSlide()">I UNDERSTAND</button>
+            </div>
+        </div>
+
+        <!-- 10. TRIAL 1: MATCHING -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-link"></i> CHALLENGE 1: CONNECTIONS</h2>
+                <p class="text-2xl text-white font-bold mb-10">Match the subject to the correct verb ending. Mistakes cost energy!</p>
+                
+                <div class="flex flex-col md:flex-row gap-8 justify-center w-full max-w-5xl mx-auto">
+                    <div class="flex flex-col gap-5 flex-1" id="mLeft">
+                        <button class="match-btn border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-xl font-bold text-white text-left hover:bg-white/20 transition shadow-lg" data-m="1">The cow...</button>
+                        <button class="match-btn border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-xl font-bold text-white text-left hover:bg-white/20 transition shadow-lg" data-m="2">Jay and his girlfriend...</button>
+                    </div>
+                    <div class="flex flex-col gap-5 flex-1" id="mRight">
+                        <button class="match-btn border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-xl font-bold text-white text-right hover:bg-white/20 transition shadow-lg" data-m="2">...drink tea in the afternoon.</button>
+                        <button class="match-btn border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-xl font-bold text-white text-right hover:bg-white/20 transition shadow-lg" data-m="1">...rests in the shade.</button>
+                    </div>
+                </div>
+                
+                <div id="hub-match" class="speaking-hub hidden mt-12">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> Challenge passed! Ask: "Do you rest in the afternoon?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. WEIGHING SCALE -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-scale-balanced"></i> THE HABIT SORTER</h2>
+                <p class="text-2xl text-white font-bold mb-10">Sort the morning habits into Good or Bad.</p>
+                
+                <div class="bg-black/80 border-[4px] border-accent p-10 rounded-3xl w-full max-w-3xl mx-auto mb-10 shadow-[0_0_40px_rgba(251,191,36,0.3)] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-accent/5"></div>
+                    <h3 id="scale-word" class="text-3xl md:text-4xl font-black text-white tracking-widest drop-shadow-md relative z-10">WAKE UP AT 12 PM</h3>
+                </div>
+                
+                <div class="flex justify-center gap-8 mb-12">
+                    <button class="px-10 py-5 bg-red-900/80 border-2 border-red-500 rounded-2xl text-white font-black text-2xl hover:bg-red-600 transition shadow-[0_0_20px_rgba(239,68,68,0.5)]" onclick="sortHabit('BAD')">BAD HABIT</button>
+                    <button class="px-10 py-5 bg-brand/80 border-2 border-brand rounded-2xl text-white font-black text-2xl hover:bg-emerald-500 transition shadow-[0_0_20px_rgba(16,185,129,0.5)]" onclick="sortHabit('GOOD')">GOOD HABIT</button>
+                </div>
+                
+                <div class="flex gap-6 w-full max-w-5xl mx-auto">
+                    <div id="b-bad" class="flex-1 min-h-[220px] border-4 border-dashed border-red-500/50 bg-black/40 rounded-3xl p-6 flex flex-wrap gap-3 content-start shadow-inner"><span class="w-full text-red-400 font-black text-2xl mb-4 tracking-widest text-center opacity-50">BAD</span></div>
+                    <div id="b-good" class="flex-1 min-h-[220px] border-4 border-dashed border-brand/50 bg-black/40 rounded-3xl p-6 flex flex-wrap gap-3 content-start shadow-inner"><span class="w-full text-brand font-black text-2xl mb-4 tracking-widest text-center opacity-50">GOOD</span></div>
+                </div>
+                
+                <div id="hub-scale" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "What is a good morning habit that you have?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12. VIDEO CHUNK 2 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-brands fa-youtube"></i> STAY HYDRATED</h2>
+                <p class="text-2xl text-white font-bold mb-8">Watch from 4:08 to 6:40. What does he make for breakfast?</p>
+                <div class="video-wrapper mx-auto shadow-[0_0_40px_rgba(0,0,0,0.8)] border-2 border-white/20">
+                    <iframe data-src="https://www.youtube-nocookie.com/embed/VsqkTzOVP9U?start=248&end=400&rel=0&modestbranding=1" allowfullscreen></iframe>
+                </div>
+                <button class="btn-gold" onclick="nextSlide()">I FINISHED WATCHING</button>
+            </div>
+        </div>
+
+        <!-- 13. TRIAL 2: MCQ -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-list-check"></i> CHALLENGE 2: BREAKFAST</h2>
+                <p class="text-2xl font-bold text-white mb-10 bg-black/50 p-6 rounded-xl border border-white/10 shadow-inner max-w-3xl mx-auto">What does Jay make for breakfast?</p>
+                
+                <div class="grid gap-5 max-w-3xl mx-auto w-full" id="mcq-group">
+                    <button class="mcq-ans border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-2xl font-bold text-white text-left hover:bg-white/20 hover:border-white transition shadow-lg" onclick="checkMCQ(this, false)">A) Eggs and bacon.</button>
+                    <button class="mcq-ans border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-2xl font-bold text-white text-left hover:bg-white/20 hover:border-white transition shadow-lg" onclick="checkMCQ(this, true)">B) Fruit and oats.</button>
+                    <button class="mcq-ans border-2 border-white/20 bg-[#064e3b] p-6 rounded-2xl text-2xl font-bold text-white text-left hover:bg-white/20 hover:border-white transition shadow-lg" onclick="checkMCQ(this, false)">C) Toast and jam.</button>
+                </div>
+                
+                <div id="hub-mcq" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Correct! What do you eat for breakfast?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14. FACT CHECKER -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-clipboard-check"></i> FACT CHECKER</h2>
+                <p class="text-2xl text-white font-bold mb-10">Stamp the claim as Verified or Fake News.</p>
+                
+                <div class="bg-black/60 border-2 border-white/20 rounded-3xl p-12 max-w-4xl mx-auto relative overflow-hidden mb-10 shadow-2xl" id="fc-box">
+                    <p class="text-3xl font-black text-white mb-10 leading-relaxed">"He drinks about three liters of water every day."</p>
+                    <div class="flex justify-center gap-8 relative z-10">
+                        <button class="px-8 py-4 border-[3px] border-emerald-500 text-white bg-emerald-900/50 font-black text-xl rounded-xl hover:bg-emerald-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.6)] transition" onclick="checkFact(true)">VERIFIED</button>
+                        <button class="px-8 py-4 border-[3px] border-red-500 text-white bg-red-900/50 font-black text-xl rounded-xl hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] transition" onclick="checkFact(false)">FAKE NEWS</button>
+                    </div>
+                    <div id="fc-stamp" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transform rotate-[-15deg] scale-150 transition-all duration-300 text-shadow-glow"></div>
+                </div>
+
+                <div id="hub-fc" class="speaking-hub hidden">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Verified! Do you drink a lot of water?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15. ACTION SPINNER -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-bolt"></i> THE VERB WHEEL</h2>
+                <p class="text-2xl text-white font-bold mb-10">Spin to get a verb. Make a sentence about your routine!</p>
+                
+                <div class="bg-black/80 border-[6px] border-brand p-12 rounded-[2rem] max-w-3xl mx-auto mb-10 shadow-[0_0_40px_rgba(16,185,129,0.5)]">
+                    <h3 id="slot-text" class="text-4xl font-black text-white uppercase tracking-wider drop-shadow-md">SPIN TO PLAY</h3>
+                </div>
+                <button class="btn-gold mb-10 text-2xl px-12 py-5" onclick="spinWheel()" id="spin-btn">SPIN</button>
+
+                <div class="speaking-hub" id="hub-spin">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> Make sure they use the verb correctly (e.g., "I WAKE UP at 7 AM.")</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 16. VIDEO CHUNK 3 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-brands fa-youtube"></i> THE HORSES</h2>
+                <p class="text-2xl text-white font-bold mb-8">Watch from 11:15 to 13:00. Does the horse eat the grass?</p>
+                <div class="video-wrapper mx-auto shadow-[0_0_40px_rgba(0,0,0,0.8)] border-2 border-white/20">
+                    <iframe data-src="https://www.youtube-nocookie.com/embed/VsqkTzOVP9U?start=675&end=780&rel=0&modestbranding=1" allowfullscreen></iframe>
+                </div>
+                <button class="btn-gold" onclick="nextSlide()">I FINISHED WATCHING</button>
+            </div>
+        </div>
+
+        <!-- 17. GRAMMAR BLUEPRINT 2 -->
+        <div class="slide">
+            <div class="glass-panel text-left w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 text-center drop-shadow-lg"><i class="fa-solid fa-book-atlas"></i> SIMPLE PRESENT (-, ?)</h2>
+                <p class="text-2xl text-center font-bold mb-12 text-white drop-shadow-md">Negatives & Questions</p>
+                
+                <div class="bg-black/60 p-10 rounded-3xl border-2 border-brand/40 max-w-4xl mx-auto shadow-lg">
+                    <h3 class="text-brand font-black text-2xl mb-6 drop-shadow-md">DON'T vs DOESN'T</h3>
+                    <p class="text-xl text-white font-medium mb-6 leading-relaxed">Use <strong class="text-brand">don't</strong> for I/You/We/They. Use <strong class="text-accent">doesn't</strong> for He/She/It.</p>
+                    <div class="bg-brand/20 p-6 rounded-xl border-l-4 border-brand text-white text-xl font-bold shadow-inner mb-6">
+                        "<span class="text-brand drop-shadow-md">I don't</span> drink tea."
+                    </div>
+                    <div class="bg-accent/20 p-6 rounded-xl border-l-4 border-accent text-white text-xl font-bold shadow-inner">
+                        "<span class="text-accent drop-shadow-md">The horse doesn't</span> want my grass."
+                    </div>
+                </div>
+                <div class="text-center mt-12">
+                    <button class="btn-gold text-xl py-5 px-10" onclick="nextSlide()">PRACTICE IT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 18. GRAMMAR SANDBOX 2 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-sliders"></i> THE MIXING DESK 2</h2>
+                <p class="text-2xl text-white font-bold mb-10">Change the subject in negative sentences.</p>
+                
+                <div class="flex flex-wrap justify-center gap-6 mb-12">
+                    <button class="px-8 py-4 bg-brand border border-white/30 text-white rounded-2xl font-black text-lg shadow-[0_0_15px_rgba(16,185,129,0.5)]" onclick="switchSand2(this, 'I DON\'T wake up early.', 'Subject: I')">I Don't</button>
+                    <button class="px-8 py-4 bg-[#064e3b] border border-white/20 text-white rounded-2xl font-bold text-lg hover:bg-brand/80 hover:border-white transition shadow-lg" onclick="switchSand2(this, 'JAY DOESN\'T wake up early.', 'Subject: He')">Jay Doesn't</button>
+                </div>
+                
+                <div class="bg-black/80 p-12 rounded-[2rem] border-l-[10px] border-brand w-full max-w-4xl mx-auto shadow-inner">
+                    <p id="sand2-label" class="text-brand font-code font-black text-xl tracking-[0.2em] mb-6 drop-shadow-md">Subject: I</p>
+                    <p id="sand2-text" class="text-4xl font-black text-white leading-relaxed"><span class="bg-brand/20 border border-brand/50 text-brand px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.3)] inline-block m-1">I</span> <span class="bg-brand/20 border border-brand/50 text-brand px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.3)] inline-block m-1">DON'T</span> wake up early.</p>
+                </div>
+                <button class="btn-gold mt-12" onclick="nextSlide()">I UNDERSTAND</button>
+            </div>
+        </div>
+
+        <!-- 19. SYNTAX BUILDER -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-wrench"></i> CHALLENGE 3: SENTENCE ASSEMBLY</h2>
+                <p class="text-2xl text-white font-bold mb-10">Click the words to build a correct sentence.</p>
+                
+                <div id="dropZone" class="min-h-[120px] w-full max-w-4xl mx-auto bg-black/60 border-4 border-dashed border-white/20 rounded-3xl mb-10 p-6 flex flex-wrap gap-4 items-center justify-center shadow-inner"></div>
+                
+                <div id="wordBank" class="flex flex-wrap gap-4 justify-center max-w-4xl mx-auto">
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">He</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">morning</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">wakes</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">in</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">up</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">the</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">early</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">every</span>
+                    <span class="word-chip px-8 py-4 rounded-xl font-bold text-2xl" onclick="moveWord(this)">countryside.</span>
+                </div>
+
+                <div id="hub-syn" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Excellent! Do you wake up early?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 20. FIND THE MISTAKE -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-bug"></i> CHALLENGE 4: FIND THE MISTAKE</h2>
+                <p class="text-2xl text-white font-bold mb-10">Click the grammatically INCORRECT block to fix the sentence.</p>
+                
+                <div class="flex flex-wrap justify-center gap-4 text-4xl font-black bg-black/60 p-12 rounded-3xl border-2 border-white/10 max-w-5xl mx-auto shadow-2xl" id="mistake-container">
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">He</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-brand/40 border-[3px] border-transparent hover:border-brand transition text-white" onclick="checkMistake(this, true)">don't</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">like</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">to</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">run</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">in</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">the</span>
+                    <span class="px-5 py-3 rounded-2xl cursor-pointer hover:bg-white/10 transition text-white" onclick="checkMistake(this, false)">morning.</span>
+                </div>
+
+                <div id="hub-mistake" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Rule: He/She/It uses DOESN'T!"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 21. DATA RECOVERY -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-hard-drive"></i> RESTORE THE STORY</h2>
+                <p class="text-2xl text-white font-bold mb-8">Restore the correct verbs in the text!</p>
+                
+                <div class="bg-black/80 border-2 border-accent/50 p-10 rounded-3xl max-w-4xl mx-auto shadow-[0_0_30px_rgba(251,191,36,0.3)] font-code text-2xl leading-loose text-slate-300 text-left mb-10">
+                    "My friend Jay loves the farm. He 
+                    <select id="rec-1" class="bg-slate-800 text-white border-2 border-accent rounded-lg px-3 py-1 outline-none focus:border-white cursor-pointer inline-block mx-2 shadow-lg transition">
+                        <option value="">[ SELECT ]</option>
+                        <option value="walk">walk</option>
+                        <option value="walks">walks</option>
+                        <option value="walking">walking</option>
+                    </select> every morning. But he 
+                    <select id="rec-2" class="bg-slate-800 text-white border-2 border-accent rounded-lg px-3 py-1 outline-none focus:border-white cursor-pointer inline-block mx-2 shadow-lg transition">
+                        <option value="">[ SELECT ]</option>
+                        <option value="don't run">don't run</option>
+                        <option value="doesn't runs">doesn't runs</option>
+                        <option value="doesn't run">doesn't run</option>
+                    </select> because he gets tired."
+                </div>
+                
+                <button class="btn-gold text-2xl px-12 py-4" onclick="checkRecovery()" id="rec-btn">FILL THE GAPS</button>
+
+                <div id="hub-recovery" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Story restored! Do you run or walk in the morning?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 22. TEXTING SCENARIO -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-brands fa-whatsapp text-emerald-500"></i> TEXTING A FRIEND</h2>
+                <p class="text-2xl text-white font-bold mb-10">Text your friend about the farm.</p>
+                
+                <div class="phone-ui mx-auto shadow-[0_30px_60px_rgba(0,0,0,0.9)] border-[12px] border-slate-800 h-[650px]">
+                    <div class="phone-notch"></div>
+                    <div class="bg-slate-900 p-5 pt-10 border-b border-slate-700 font-bold text-center text-xl text-white">Bestie 🚜</div>
+                    <div class="flex-1 p-5 overflow-y-auto flex flex-col gap-4" id="chat-area">
+                        <div class="msg-received phone-msg">Hey! How is the countryside?</div>
+                        <div class="msg-received phone-msg">Do you like the animals?</div>
+                        <div class="typing-indicator" id="typing-dot"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    </div>
+                    <div class="bg-black p-5 border-t border-slate-800 flex flex-col gap-3" id="chat-opts">
+                        <button class="bg-slate-800 border border-slate-600 p-4 rounded-2xl text-left text-white font-bold hover:bg-brand hover:border-white transition shadow-md" onclick="advanceChat(true)">It is great! The cow rests in the shade all day.</button>
+                        <button class="bg-slate-800 border border-slate-600 p-4 rounded-2xl text-left text-white font-bold hover:bg-brand hover:border-white transition shadow-md" onclick="advanceChat(false)">It is great! The cow rest in the shade.</button>
+                    </div>
+                </div>
+                
+                <div id="hub-chat" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Awesome! Do you like farm animals?"</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 23. STAND YOUR GROUND -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-balance-scale"></i> STAND YOUR GROUND</h2>
+                <p class="text-2xl text-white font-bold mb-10">What is your opinion on this statement?</p>
+                
+                <div class="bg-black/60 p-12 rounded-3xl border-2 border-dashed border-accent text-4xl font-black mb-12 max-w-5xl mx-auto shadow-inner text-white leading-relaxed">
+                    "Living in the countryside is much better than living in the city."
+                </div>
+                
+                <div class="flex flex-wrap justify-center gap-6" id="agree-box">
+                    <button class="px-10 py-5 border-4 border-red-500 text-white font-black text-2xl rounded-2xl hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] transition bg-black/50" onclick="selectAgree(this, 'disagree')">DISAGREE</button>
+                    <button class="px-10 py-5 border-4 border-yellow-500 text-white font-black text-2xl rounded-2xl hover:bg-yellow-500 hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] transition bg-black/50" onclick="selectAgree(this, 'neutral')">NEUTRAL</button>
+                    <button class="px-10 py-5 border-4 border-emerald-500 text-white font-black text-2xl rounded-2xl hover:bg-emerald-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] transition bg-black/50" onclick="selectAgree(this, 'agree')">AGREE</button>
+                </div>
+                
+                <div id="hub-agree" class="speaking-hub hidden mt-10">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> "Why did you choose that? Tell me about your routine in the city/country."</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">NEXT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 24. LIE DETECTOR -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-6 drop-shadow-lg"><i class="fa-solid fa-heart-pulse"></i> THE LIE DETECTOR</h2>
+                <p class="text-2xl text-white font-bold mb-10">Tell the teacher 3 things about your daily routine. 2 are TRUE, 1 is a LIE!</p>
+                
+                <div class="bg-black/60 border-2 border-brand p-10 rounded-3xl max-w-3xl mx-auto text-left mb-10 text-2xl space-y-6 font-code text-white shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                    <p class="font-bold"><span class="text-brand">1.</span> Every morning, I...</p>
+                    <p class="font-bold"><span class="text-brand">2.</span> I don't...</p>
+                    <p class="font-bold"><span class="text-brand">3.</span> On weekends, I usually...</p>
+                </div>
+
+                <div class="speaking-hub" style="display:block;">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> Play along! Guess which one is the lie. Then, tell 3 facts about yourself and let the student guess.</p>
+                    <button class="btn-start btn-gold mt-8" onclick="nextSlide()">ENTER FINALE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 25. RPG 1 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-2 drop-shadow-lg"><i class="fa-solid fa-sun"></i> THE MORNING</h2>
+                <p class="text-accent font-code font-bold tracking-[0.3em] mb-10 text-xl">PART 1 / 2</p>
+                
+                <i class="fa-regular fa-sun text-7xl text-accent mb-10 drop-shadow-lg"></i>
+                <p class="text-3xl text-white font-bold mb-12 max-w-4xl mx-auto leading-relaxed">It is 6 AM in the countryside. The sun is up. What do you do?</p>
+                
+                <div class="grid gap-6 max-w-4xl mx-auto w-full">
+                    <button class="bg-slate-800/80 border-2 border-white/20 p-8 rounded-2xl text-2xl text-white font-bold hover:border-brand hover:bg-brand/20 transition text-left shadow-lg" onclick="handleRPG(1, true)">"I get up and take a walk."</button>
+                    <button class="bg-slate-800/80 border-2 border-white/20 p-8 rounded-2xl text-2xl text-white font-bold hover:border-brand hover:bg-brand/20 transition text-left shadow-lg" onclick="handleRPG(1, false)">"I gets up and takes a walk."</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 26. RPG 2 -->
+        <div class="slide">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-2 drop-shadow-lg"><i class="fa-solid fa-tractor"></i> THE FARM CHORES</h2>
+                <p class="text-accent font-code font-bold tracking-[0.3em] mb-10 text-xl">PART 2 / 2</p>
+                
+                <i class="fa-solid fa-horse text-7xl text-amber-600 mb-10 drop-shadow-lg"></i>
+                <p class="text-3xl text-white font-bold mb-12 max-w-4xl mx-auto leading-relaxed">You are hungry, but you need to feed the horse. What is your routine?</p>
+                
+                <div class="grid gap-6 max-w-4xl mx-auto w-full">
+                    <button class="bg-slate-800/80 border-2 border-white/20 p-8 rounded-2xl text-2xl text-white font-bold hover:border-brand hover:bg-brand/20 transition text-left shadow-lg" onclick="handleRPG(2, false)">"I doesn't eat first. I feeds the horse."</button>
+                    <button class="bg-slate-800/80 border-2 border-white/20 p-8 rounded-2xl text-2xl text-white font-bold hover:border-brand hover:bg-brand/20 transition text-left shadow-lg" onclick="handleRPG(2, true)">"I don't eat first. I feed the horse."</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 27. FINAL PITCH -->
+        <div class="slide" data-hub="true">
+            <div class="glass-panel text-center w-full">
+                <h2 class="text-4xl font-display font-black text-brand mb-8 drop-shadow-lg"><i class="fa-solid fa-microphone-lines"></i> YOUR ROUTINE</h2>
+                <p class="text-2xl text-white font-bold mb-10">You have 60 seconds to describe your perfect daily routine.</p>
+                
+                <div class="bg-black/60 border-2 border-brand p-10 rounded-3xl max-w-3xl mx-auto text-left mb-10 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                    <h3 class="text-white font-black text-2xl mb-6 uppercase tracking-widest drop-shadow-md">Checklist:</h3>
+                    <ul class="text-xl text-white font-medium space-y-4">
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> Say what time you wake up.</li>
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> Say what you eat for breakfast.</li>
+                        <li><i class="fa-solid fa-check text-brand mr-3 text-2xl"></i> Say one thing you <strong class="text-brand">don't</strong> do in the morning.</li>
+                    </ul>
+                </div>
+                
+                <button class="btn-gold text-2xl px-12 py-5" onclick="document.getElementById('p_21_pitch').style.display='block'; startTimer(); toggleSidebar('sidebar-left'); unlockNextManual();">START PITCH</button>
+                
+                <div class="speaking-hub" id="p_21_pitch">
+                    <p class="text-xl text-white font-medium"><strong>TEACHER:</strong> Listen carefully! Give them XP points on the HUD. (The 60s timer has been started).</p>
+                    <button class="btn-gold mt-6" onclick="nextSlide()">FINISH SIMULATION</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 28. MISSION COMPLETE -->
+        <div class="slide" data-hub="false">
+            <div class="glass-panel text-center w-full">
+                <i class="fa-solid fa-shield-check text-9xl text-brand mb-10 filter drop-shadow-[0_0_50px_#10b981] animate-[popIn_0.8s_ease-out]"></i>
+                <h1 class="text-7xl font-display font-black text-brand mb-6 drop-shadow-lg">DAY COMPLETED</h1>
+                <p class="text-3xl text-white font-bold mb-12">Exceptional work today, <span class="dyn-name text-accent">PLAYER</span>!</p>
+                
+                <div class="bg-black/80 border-4 border-brand/50 p-12 rounded-3xl inline-block shadow-[0_0_40px_rgba(16,185,129,0.3)]">
+                    <p class="text-lg text-brand font-bold uppercase tracking-[0.3em] mb-4">Final XP Earned</p>
+                    <p class="text-7xl font-code font-black text-white drop-shadow-[0_0_20px_#10b981]" id="finalScoreDisplay">0 XP</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER CONTROLS -->
+    <div class="progress-bar" id="progressBar"></div>
+    <footer class="app-footer">
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled>
+            <i class="fa-solid fa-chevron-left"></i> <span class="hidden md:inline">BACK</span>
+        </button>
+        <div class="flex-1 font-code font-bold text-xs sm:text-base md:text-lg text-white tracking-[0.1em] md:tracking-[0.2em] drop-shadow-md whitespace-nowrap text-center mx-2 overflow-hidden text-ellipsis">
+            PAGE <span class="text-brand text-lg sm:text-2xl font-black mx-1" id="step-id">1</span> / 28
+        </div>
+        <button class="nav-btn next" id="next-btn" onclick="nextSlide()">
+            <span class="hidden md:inline">NEXT</span> <i class="fa-solid fa-chevron-right md:ml-2"></i>
+        </button>
+    </footer>
+
+    <!-- JS ENGINE -->
+    <script>
+        // --- GAME STATE ---
+        const gameState = { name: "Visitor", xp: 0, hp: 3, maxHp: 3, multiplier: 1, currentSlide: 0 };
+        const totalSlides = 28;
+        const slides = document.querySelectorAll('.slide');
+
+        // --- CORE NAVIGATION ---
+        function updateSlide() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === gameState.currentSlide));
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if(prevBtn) prevBtn.disabled = gameState.currentSlide === 0;
+            if(gameState.currentSlide === totalSlides - 1) { if(nextBtn) nextBtn.style.display = 'none'; } 
+            else { if(nextBtn) nextBtn.style.display = 'flex'; }
+
+            document.getElementById('step-id').innerText = gameState.currentSlide + 1;
+            document.getElementById('progressBar').style.width = `${((gameState.currentSlide + 1) / totalSlides) * 100}%`;
+            
+            if(nextBtn) nextBtn.classList.remove('pulsing');
+
+            // Handle Iframes (Stop video when changing slides)
+            slides.forEach((s, i) => {
+                const iframe = s.querySelector('.video-wrapper iframe');
+                if (iframe) {
+                    if (i === gameState.currentSlide) {
+                        if (!iframe.src || iframe.src === 'about:blank' || iframe.src === window.location.href) {
+                            iframe.src = iframe.getAttribute('data-src');
+                        }
+                    } else { iframe.src = ''; }
+                }
+            });
+
+            // Final Score update if last slide
+            if(gameState.currentSlide === totalSlides - 1) {
+                document.getElementById('finalScoreDisplay').innerText = `${gameState.xp} XP`;
+            }
+        }
+
+        function unlockNextManual() {
+            const nextButton = document.getElementById('next-btn');
+            if(nextButton) nextButton.classList.add('pulsing');
+        }
+
+        function nextSlide() { if(gameState.currentSlide < totalSlides - 1) { gameState.currentSlide++; updateSlide(); } }
+        function prevSlide() { if(gameState.currentSlide > 0) { gameState.currentSlide--; updateSlide(); } }
+
+        // --- RPG MECHANICS ---
+        function startGame() {
+            const nameInput = document.getElementById('s-name').value.trim();
+            if(!nameInput) {
+                alert("Please enter your name to start the day.");
+                return;
+            }
+            gameState.name = nameInput;
+            document.querySelectorAll('.dyn-name').forEach(el => el.innerText = gameState.name.toUpperCase());
+            
+            document.getElementById('playerStats').classList.remove('hidden');
+            document.getElementById('playerStats').classList.add('flex');
+            updateHUD();
+            nextSlide();
+        }
+
+        function updateHUD() {
+            document.getElementById('hudXp').innerText = `${gameState.xp} XP`;
+            let hpHTML = '';
+            for(let i=0; i<gameState.maxHp; i++) {
+                if(i < gameState.hp) hpHTML += '<i class="fa-solid fa-heart-pulse text-brand drop-shadow-[0_0_10px_#10b981]"></i>';
+                else hpHTML += '<i class="fa-regular fa-heart text-slate-500"></i>';
+            }
+            document.getElementById('hudHp').innerHTML = hpHTML;
+        }
+
+        function gainXP(amount) {
+            let actualAmount = amount * gameState.multiplier;
+            gameState.xp += actualAmount;
+            updateHUD();
+            
+            const popup = document.createElement('div');
+            popup.className = 'xp-popup';
+            popup.innerText = `+${actualAmount} XP`;
+            popup.style.left = '50%';
+            popup.style.top = '10%';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
+        }
+
+        function takeDamage() {
+            gameState.hp--;
+            updateHUD();
+            
+            const flash = document.getElementById('damageFlash');
+            flash.style.display = 'block';
+            document.body.classList.add('shake');
+            setTimeout(() => {
+                flash.style.display = 'none';
+                document.body.classList.remove('shake');
+            }, 500);
+
+            if(gameState.hp <= 0) {
+                alert("You ran out of energy! Time to rest. Refresh the page to start a new day.");
+                location.reload();
+            }
+        }
+
+        function healPlayer() { 
+            if(gameState.hp < gameState.maxHp) { gameState.hp++; updateHUD(); } 
+        }
+
+        // --- TEACHER TOOLS ---
+        function toggleSidebar(id) {
+            let el = document.getElementById(id);
+            if (!el) return;
+            
+            if(el.classList.contains('open')) {
+                el.classList.remove('open');
+            } else {
+                document.querySelectorAll('.sidebar').forEach(p => p.classList.remove('open'));
+                el.classList.add('open');
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => { console.log(err); });
+            } else {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+            }
+        }
+
+        let timerInt; let time = 60;
+        function startTimer() {
+            clearInterval(timerInt); time = 60;
+            const tEl = document.getElementById('dmTimer');
+            tEl.innerText = "00:60"; tEl.classList.remove('text-incorrect');
+            timerInt = setInterval(() => {
+                time--; tEl.innerText = `00:${time < 10 ? '0'+time : time}`;
+                if(time <= 10) tEl.classList.add('text-incorrect');
+                if(time <= 0) clearInterval(timerInt);
+            }, 1000);
+        }
+
+        // --- INTERACTIVE ELEMENTS ---
+        function genericCorrect(hubId) {
+            document.getElementById(hubId).style.display = 'block';
+            gainXP(10);
+            unlockNextManual();
+        }
+
+        function revealStarter(btn) {
+            btn.style.display = 'none';
+            const content = btn.nextElementSibling;
+            if(content && content.classList.contains('starter-content')) content.style.display = 'block';
+        }
+
+        function flipTopic(card, question, starter) {
+            if(card.classList.contains('flipped')) return;
+            card.classList.add('flipped');
+            card.querySelector('.t-back').innerText = question;
+            document.getElementById('cards-starter').innerText = `"${starter}"`;
+            document.getElementById('hub-cards').style.display = 'block';
+            gainXP(20);
+            unlockNextManual();
+        }
+
+        // Dictionary
+        const vocabData = {
+            'take a stroll': { phonetic: '/teɪk ə stroʊl/', def: 'To walk slowly in a relaxed way.', context: 'I take a stroll every morning.', speak: 'Do you take a stroll in the park?' },
+            'bucket': { phonetic: '/ˈbʌk.ɪt/', def: 'A container with a handle used for holding liquids.', context: 'He fills the bucket with water.', speak: 'What do you put in a bucket?' },
+            'peel': { phonetic: '/piːl/', def: 'To remove the skin of fruit or vegetables.', context: 'She peels the mango.', speak: 'Do you peel apples before you eat them?' },
+            'barefoot': { phonetic: '/ˈber.fʊt/', def: 'Wearing nothing on the feet.', context: 'He plays frisbee barefoot.', speak: 'Do you walk barefoot in your house?' }
+        };
+
+        function openDict(word, el) {
+            if(el) { el.style.borderColor = 'var(--brand)'; el.style.opacity = '0.5'; }
+            const data = vocabData[word.toLowerCase()];
+            if(!data) return;
+
+            document.getElementById('d-word').innerText = word.toUpperCase();
+            document.getElementById('d-phonetic').innerText = data.phonetic;
+            document.getElementById('d-def').innerText = data.def;
+            document.getElementById('d-context').innerText = `"${data.context}"`;
+            document.getElementById('d-speak').innerText = `"${data.speak}"`;
+            
+            document.getElementById('dict-modal').classList.remove('hidden');
+            document.getElementById('dict-modal').classList.add('flex');
+            gainXP(10);
+        }
+
+        function closeDict() {
+            document.getElementById('dict-modal').classList.add('hidden');
+            document.getElementById('dict-modal').classList.remove('flex');
+        }
+
+        // Sandbox
+        function switchSand(btn, sentence, label) {
+            let siblings = btn.parentElement.children;
+            for(let s of siblings) { s.classList.remove('bg-brand'); s.classList.add('bg-[#064e3b]'); }
+            btn.classList.remove('bg-[#064e3b]'); btn.classList.add('bg-brand');
+            
+            const words = sentence.split(' ');
+            let formatted = words.map(w => {
+                if(w.includes('I') || w.includes('DRINK') || w.includes('SHE') || w.includes('DRINKS') || w.includes('THE') || w.includes('DOG') || w.includes('SLEEPS')) return `<span class="bg-brand/20 border border-brand/50 text-brand px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.3)] inline-block m-1">${w}</span>`;
+                return w;
+            }).join(' ');
+
+            document.getElementById('sand-text').innerHTML = formatted;
+            document.getElementById('sand-label').innerText = label;
+        }
+
+        function switchSand2(btn, sentence, label) {
+            let siblings = btn.parentElement.children;
+            for(let s of siblings) { s.classList.remove('bg-brand'); s.classList.add('bg-[#064e3b]'); }
+            btn.classList.remove('bg-[#064e3b]'); btn.classList.add('bg-brand');
+            
+            const words = sentence.split(' ');
+            let formatted = words.map(w => {
+                if(w.includes('DON\'T') || w.includes('DOESN\'T') || w.includes('I') || w.includes('JAY')) return `<span class="bg-brand/20 border border-brand/50 text-brand px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.3)] inline-block m-1">${w}</span>`;
+                return w;
+            }).join(' ');
+
+            document.getElementById('sand2-text').innerHTML = formatted;
+            document.getElementById('sand2-label').innerText = label;
+        }
+
+        // Trial 1 Match
+        let firstMatch = null;
+        document.querySelectorAll('.match-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if(this.classList.contains('matched')) return;
+                
+                if(!firstMatch) {
+                    this.classList.add('selected');
+                    firstMatch = this;
+                } else {
+                    if(this.parentElement.id !== firstMatch.parentElement.id && this.dataset.m === firstMatch.dataset.m) {
+                        this.classList.add('matched');
+                        firstMatch.classList.remove('selected');
+                        firstMatch.classList.add('matched');
+                        firstMatch = null;
+                        gainXP(30);
+                        
+                        if(document.querySelectorAll('.match-btn.matched').length === 4) {
+                            document.getElementById('hub-match').style.display = 'block';
+                            unlockNextManual();
+                        }
+                    } else {
+                        firstMatch.classList.remove('selected');
+                        this.classList.add('shake', 'border-red-500');
+                        setTimeout(() => this.classList.remove('shake', 'border-red-500'), 400);
+                        firstMatch = null;
+                        takeDamage();
+                    }
+                }
+            });
+        });
+
+        // Sorter
+        const scaleWords = [
+            {w: 'WAKE UP AT 12 PM', t: 'BAD'}, 
+            {w: 'TAKE A MORNING STROLL', t: 'GOOD'}, 
+            {w: 'DRINK 3 LITERS OF WATER', t: 'GOOD'},
+            {w: 'SKIP BREAKFAST', t: 'BAD'},
+            {w: 'EAT FRESH FRUIT', t: 'GOOD'},
+            {w: 'STAY INSIDE ALL DAY', t: 'BAD'}
+        ];
+        let currentScaleIndex = 0;
+        function sortHabit(guessType) {
+            if(currentScaleIndex >= scaleWords.length) return;
+            const item = scaleWords[currentScaleIndex];
+            const display = document.getElementById('scale-word');
+            
+            if(guessType === item.t) {
+                const basket = document.getElementById(guessType === 'BAD' ? 'b-bad' : 'b-good');
+                const chip = document.createElement('div');
+                
+                // Color code the chips inside the baskets for a better visual reward
+                if (guessType === 'BAD') {
+                    chip.className = 'bg-red-900/60 border border-red-500/50 text-white font-bold px-4 py-2 rounded-lg shadow-md text-sm md:text-base';
+                } else {
+                    chip.className = 'bg-emerald-900/60 border border-emerald-500/50 text-white font-bold px-4 py-2 rounded-lg shadow-md text-sm md:text-base';
+                }
+                
+                chip.innerText = item.w;
+                basket.appendChild(chip);
+                gainXP(20);
+                
+                currentScaleIndex++;
+                if(currentScaleIndex < scaleWords.length) {
+                    display.style.opacity = '0';
+                    display.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        display.innerText = scaleWords[currentScaleIndex].w;
+                        display.style.opacity = '1';
+                        display.style.transform = 'scale(1)';
+                    }, 250);
+                } else {
+                    display.innerText = "ALL SORTED!";
+                    display.className = "text-4xl font-black text-emerald-500 tracking-widest drop-shadow-[0_0_15px_rgba(16,185,129,0.8)] relative z-10";
+                    document.getElementById('hub-scale').style.display = 'block';
+                    unlockNextManual();
+                }
+            } else {
+                display.classList.add('text-red-500', 'shake');
+                takeDamage();
+                setTimeout(() => display.classList.remove('text-red-500', 'shake'), 400);
+            }
+        }
+
+        // MCQ
+        function checkMCQ(btn, isCorrect) {
+            if(btn.parentElement.classList.contains('locked')) return;
+            if(isCorrect) {
+                btn.classList.remove('bg-[#064e3b]', 'border-white/20');
+                btn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-emerald-500', 'border-emerald-400', 'text-white', 'shadow-[0_0_20px_rgba(16,185,129,0.5)]');
+                btn.parentElement.classList.add('locked');
+                gainXP(40);
+                document.getElementById('hub-mcq').style.display = 'block';
+                unlockNextManual();
+            } else {
+                btn.classList.remove('bg-[#064e3b]', 'border-white/20');
+                btn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-red-500', 'border-red-400', 'text-white', 'shadow-[0_0_20px_rgba(239,68,68,0.5)]', 'shake');
+                takeDamage();
+                setTimeout(() => {
+                    btn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-red-500', 'border-red-400', 'text-white', 'shadow-[0_0_20px_rgba(239,68,68,0.5)]', 'shake');
+                    btn.classList.add('bg-[#064e3b]', 'border-white/20');
+                }, 800);
+            }
+        }
+
+        // Fact Checker
+        function checkFact(isCorrect) {
+            const box = document.getElementById('fc-box');
+            if(box.classList.contains('locked')) return;
+            box.classList.add('locked');
+            
+            const stamp = document.getElementById('fc-stamp');
+            if(isCorrect) { 
+                stamp.innerText = 'VERIFIED';
+                stamp.className = 'absolute inset-0 flex items-center justify-center text-7xl font-black pointer-events-none transform rotate-[-15deg] scale-100 transition-all duration-300 opacity-100 text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]';
+                box.style.borderColor = '#10b981';
+                gainXP(30);
+                document.getElementById('hub-fc').style.display = 'block';
+                unlockNextManual();
+            } else {
+                stamp.innerText = 'INCORRECT';
+                stamp.className = 'absolute inset-0 flex items-center justify-center text-7xl font-black pointer-events-none transform rotate-[-15deg] scale-100 transition-all duration-300 opacity-100 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]';
+                box.style.borderColor = '#ef4444';
+                takeDamage();
+                setTimeout(() => {
+                    box.classList.remove('locked');
+                    stamp.style.opacity = '0';
+                    box.style.borderColor = 'rgba(255,255,255,0.2)';
+                }, 1000);
+            }
+        }
+
+        // Spinner
+        let spinnerOptions = ["WAKE UP", "EAT BREAKFAST", "TAKE A STROLL", "DRINK WATER"];
+        function spinWheel() {
+            if(spinnerOptions.length === 0) return;
+            const display = document.getElementById('slot-text');
+            const btn = document.getElementById('spin-btn');
+            btn.disabled = true;
+            
+            let count = 0;
+            const int = setInterval(() => {
+                display.innerText = spinnerOptions[Math.floor(Math.random() * spinnerOptions.length)];
+                count++;
+                if(count > 15) {
+                    clearInterval(int);
+                    const idx = Math.floor(Math.random() * spinnerOptions.length);
+                    display.innerText = spinnerOptions[idx];
+                    spinnerOptions.splice(idx, 1);
+                    display.style.color = "var(--brand)";
+                    document.getElementById('hub-spin').style.display = 'block';
+                    btn.disabled = false;
+                    gainXP(20);
+                    unlockNextManual();
+                }
+            }, 80);
+        }
+
+        // Syntax Builder
+        const targetSentence = "He,wakes,up,early,every,morning,in,the,countryside.";
+        let currentBuild = [];
+        function moveWord(chip) {
+            if(chip.classList.contains('opacity-50')) return;
+            
+            const dz = document.getElementById('dropZone');
+            const clone = chip.cloneNode(true);
+            clone.onclick = function() {
+                dz.removeChild(this);
+                chip.classList.remove('opacity-50', 'pointer-events-none');
+                currentBuild.splice(currentBuild.indexOf(this.innerText), 1);
+            };
+            
+            dz.appendChild(clone);
+            chip.classList.add('opacity-50', 'pointer-events-none');
+            currentBuild.push(chip.innerText);
+
+            if(currentBuild.length === 9) {
+                if(currentBuild.join(',') === targetSentence) {
+                    dz.classList.add('border-emerald-500', 'bg-emerald-500/10');
+                    dz.style.pointerEvents = 'none';
+                    Array.from(dz.children).forEach(c => { 
+                        c.style.background = 'linear-gradient(135deg, #059669, #047857)'; 
+                        c.style.color = '#ffffff'; 
+                        c.style.border = '1px solid #10b981'; 
+                        c.style.boxShadow = '0 5px 15px rgba(16,185,129,0.4)'; 
+                        c.style.cursor = 'default'; 
+                    });
+                    gainXP(50);
+                    document.getElementById('hub-syn').style.display = 'block';
+                    unlockNextManual();
+                } else {
+                    dz.classList.add('border-red-500', 'shake');
+                    takeDamage();
+                    setTimeout(() => {
+                        dz.innerHTML = '';
+                        dz.classList.remove('border-red-500', 'shake');
+                        document.querySelectorAll('#wordBank .word-chip').forEach(c => c.classList.remove('opacity-50', 'pointer-events-none'));
+                        currentBuild = [];
+                    }, 800);
+                }
+            }
+        }
+
+        // Find Mistake
+        function checkMistake(span, isMistake) {
+            if(span.parentElement.classList.contains('solved')) return;
+            if(isMistake) {
+                span.innerText = "doesn't";
+                span.classList.remove('hover:bg-brand/40', 'border-transparent');
+                span.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-emerald-500', 'text-white', 'shadow-[0_0_20px_rgba(16,185,129,0.8)]', 'border-emerald-400');
+                span.parentElement.classList.add('solved');
+                gainXP(40);
+                document.getElementById('hub-mistake').style.display = 'block';
+                unlockNextManual();
+            } else {
+                span.classList.add('bg-red-500', 'shake', 'text-white');
+                takeDamage();
+                setTimeout(() => span.classList.remove('bg-red-500', 'shake', 'text-white'), 500);
+            }
+        }
+
+        // Data Recovery
+        function checkRecovery() {
+            const r1 = document.getElementById('rec-1').value;
+            const r2 = document.getElementById('rec-2').value;
+            const btn = document.getElementById('rec-btn');
+            
+            if(r1 === "walks" && r2 === "doesn't run") {
+                document.getElementById('rec-1').classList.replace('text-white', 'text-emerald-400');
+                document.getElementById('rec-1').classList.replace('border-accent', 'border-emerald-500');
+                document.getElementById('rec-2').classList.replace('text-white', 'text-emerald-400');
+                document.getElementById('rec-2').classList.replace('border-accent', 'border-emerald-500');
+                document.getElementById('rec-1').disabled = true;
+                document.getElementById('rec-2').disabled = true;
+                
+                document.getElementById('hub-recovery').style.display = 'block';
+                btn.style.display = 'none';
+                gainXP(50);
+                unlockNextManual();
+            } else {
+                btn.classList.add('shake');
+                takeDamage();
+                setTimeout(() => btn.classList.remove('shake'), 500);
+            }
+        }
+
+        // Phone UI
+        function advanceChat(isCorrect) {
+            if(!isCorrect) { takeDamage(); return; }
+            
+            const dot = document.getElementById('typing-dot');
+            const btn = event.target;
+            const text = btn.innerText;
+            
+            document.getElementById('chat-opts').innerHTML = '';
+            
+            const sentMsg = document.createElement('div');
+            sentMsg.className = 'msg-sent phone-msg text-white font-bold block shadow-[0_0_10px_rgba(16,185,129,0.4)]';
+            sentMsg.innerText = text;
+            
+            dot.parentNode.insertBefore(sentMsg, dot);
+            dot.style.display = 'none';
+            gainXP(30);
+            
+            setTimeout(() => {
+                document.getElementById('hub-chat').style.display = 'block';
+                unlockNextManual();
+            }, 500);
+        }
+
+        // Stand Your Ground
+        function selectAgree(btn, type) {
+            if(document.getElementById('agree-box').classList.contains('locked')) return;
+            
+            if (type === 'agree') {
+                btn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-emerald-500', 'border-emerald-400', 'shadow-[0_0_20px_rgba(16,185,129,0.8)]');
+            } else if (type === 'neutral') {
+                btn.classList.add('bg-gradient-to-r', 'from-yellow-600', 'to-yellow-500', 'border-yellow-400', 'shadow-[0_0_20px_rgba(234,179,8,0.8)]');
+            } else {
+                btn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-red-500', 'border-red-400', 'shadow-[0_0_20px_rgba(239,68,68,0.8)]');
+            }
+
+            document.getElementById('agree-box').classList.add('locked');
+            gainXP(20);
+            document.getElementById('hub-agree').style.display = 'block';
+            unlockNextManual();
+        }
+
+        // RPG
+        function handleRPG(nodeNum, isCorrect) {
+            if(isCorrect) {
+                gainXP(60);
+                document.getElementById(`rpgNode${nodeNum}`).classList.add('hidden');
+                document.getElementById(`rpgNode${nodeNum+1}`).classList.remove('hidden');
+                document.getElementById(`rpgNode${nodeNum+1}`).classList.add('animate-[fadeIn_0.5s]');
+                if(nodeNum === 2) { unlockNextManual(); }
+            } else {
+                takeDamage();
+            }
+        }
+
+        // Init
+        updateSlide();
+    </script>
+</body>
+</html>
